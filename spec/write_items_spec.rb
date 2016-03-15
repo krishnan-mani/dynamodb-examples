@@ -7,6 +7,16 @@ require 'byebug'
 RSpec.describe Writer do
   connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
 
+  before(:each) do
+    client = Aws::DynamoDB::Client.new(connection_info)
+    tables = client.list_tables.table_names
+    tables.each do |table|
+      client.delete_table({
+                              table_name: table
+                          })
+    end
+  end
+
   it 'saves a rich document by hash key to DynamoDB' do
     item = {
         k1: 'v1',
@@ -33,6 +43,30 @@ RSpec.describe Writer do
     expect(response.item[:k2]).to eql(item['k2'])
   end
 
+  it 'saves disparate documents by hash key to DynamoDB' do
+    items = [{k1: 'x1', k2: [1, 2, 3]}, {k1: 'x2', k2:true}]
+    Writer.new(connection_info).save_foo(*items)
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    response = client.get_item({
+                                   table_name: 'foo',
+                                   key: {
+                                       k1: 'x2'
+                                   }
+                               })
+
+    expect(response.item['k2']).to be_truthy
+
+    response = client.get_item({
+                                   table_name: 'foo',
+                                   key: {
+                                       k1: 'x1'
+                                   }
+                               })
+
+    expect(response.item['k2'].length).to eql(3)
+  end
+
   it 'saves multiple documents by hash and range keys to DynamoDB' do
     items = [{k1: 'a1', k2: 'a2'}, {k1: 'a1', k2: 'y'}]
     Writer.new(connection_info).save_bar(*items)
@@ -46,6 +80,24 @@ RSpec.describe Writer do
                                     ':v_k1': 'a1'
                                 }
                             })
+    expect(response.count).to eql(2)
+  end
+
+  it 'supports saving rich documents to DynamoDB' do
+
+    items = [{k1: 'a1', k2: 12}, {k1: 'a1', k2: 24}]
+    Writer.new(connection_info).save_xyz(*items)
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    response = client.query({
+                                table_name: 'xyz',
+                                select: 'COUNT',
+                                key_condition_expression: 'k1 = :v_k1',
+                                expression_attribute_values: {
+                                    ':v_k1': 'a1'
+                                }
+                            })
+
     expect(response.count).to eql(2)
   end
 end

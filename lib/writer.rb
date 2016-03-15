@@ -26,11 +26,57 @@ class Writer
     end
   end
 
+  def save_xyz(*items)
+    ensure_xyz_table
+    items.each do |item|
+      @client.put_item({
+                           table_name: 'xyz',
+                           item: item
+                       })
+    end
+  end
+
   private
 
+  def table_exists?(table_name)
+    @client.list_tables.table_names.include?(table_name)
+  end
+
+  def ensure_xyz_table
+    unless table_exists?('xyz')
+      @client.create_table({
+                               table_name: 'xyz',
+                               attribute_definitions: [
+                                   {
+                                       attribute_name: 'k1',
+                                       attribute_type: 'S'
+                                   },
+                                   {
+                                       attribute_name: 'k2',
+                                       attribute_type: 'N'
+                                   }
+                               ],
+                               key_schema: [
+                                   {
+                                       attribute_name: 'k1',
+                                       key_type: 'HASH'
+                                   },
+                                   {
+                                       attribute_name: 'k2',
+                                       key_type: 'RANGE'
+                                   }
+                               ],
+                               provisioned_throughput: {
+                                   read_capacity_units: 1,
+                                   write_capacity_units: 1
+                               }
+                           })
+
+    end
+  end
+
   def ensure_foo_table
-    tables = @client.list_tables.table_names
-    unless tables.include?('foo')
+    unless table_exists?('foo')
       @client.create_table({
                                table_name: 'foo',
                                attribute_definitions: [
@@ -54,8 +100,7 @@ class Writer
   end
 
   def ensure_bar_table
-    tables = @client.list_tables.table_names
-    unless tables.include?('bar')
+    unless table_exists?('bar')
       @client.create_table({
                                table_name: 'bar',
                                attribute_definitions: [
