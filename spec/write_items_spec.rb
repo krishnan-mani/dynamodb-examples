@@ -44,7 +44,7 @@ RSpec.describe Writer do
   end
 
   it 'saves disparate documents by hash key to DynamoDB' do
-    items = [{k1: 'x1', k2: [1, 2, 3]}, {k1: 'x2', k2:true}]
+    items = [{k1: 'x1', k2: [1, 2, 3]}, {k1: 'x2', k2: true}]
     Writer.new(connection_info).save_foo(*items)
 
     client = Aws::DynamoDB::Client.new(connection_info)
@@ -99,6 +99,35 @@ RSpec.describe Writer do
                             })
 
     expect(response.count).to eql(2)
+  end
+
+  it 'supports querying using hash key and comparison on range key using begins_with' do
+    items = [
+        {
+            Id: 206,
+            Brand: 'Reebok',
+            Size: 8
+        },
+        {
+            Id: 206,
+            Brand: 'Nike'
+        }
+    ]
+    Writer.new(connection_info).save_shoes(*items)
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    response = client.query({
+                                table_name: 'shoes',
+                                key_condition_expression: 'Id = :v_id AND begins_with(Brand, :v_brand)',
+                                expression_attribute_values: {
+                                    ':v_id': 206,
+                                    ':v_brand': 'Ni'
+                                }
+                            })
+
+    expect(response.items).not_to be_nil
+    expect(response.count).to eql(1)
+    expect(response.items[0]['Brand']).to eql('Nike')
   end
 
   it 'supports querying using key condition expressions' do
