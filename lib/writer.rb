@@ -6,6 +6,14 @@ class Writer
     @client = Aws::DynamoDB::Client.new(connection_info)
   end
 
+  def save_product(item)
+    ensure_products_table
+    @client.put_item({
+                         table_name: 'products',
+                         item: item
+                     })
+  end
+
   def save_foo(*items)
     ensure_foo_table
     items.each do |item|
@@ -40,6 +48,30 @@ class Writer
 
   def table_exists?(table_name)
     @client.list_tables.table_names.include?(table_name)
+  end
+
+  def ensure_products_table
+    unless table_exists?('products')
+      @client.create_table({
+                               table_name: 'products',
+                               attribute_definitions: [
+                                   {
+                                       attribute_name: 'Id',
+                                       attribute_type: 'N'
+                                   }
+                               ],
+                               key_schema: [
+                                   {
+                                       attribute_name: 'Id',
+                                       key_type: 'HASH'
+                                   }
+                               ],
+                               provisioned_throughput: {
+                                   read_capacity_units: 1,
+                                   write_capacity_units: 1
+                               }
+                           })
+    end
   end
 
   def ensure_xyz_table

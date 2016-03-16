@@ -83,9 +83,9 @@ RSpec.describe Writer do
     expect(response.count).to eql(2)
   end
 
-  it 'supports saving rich documents to DynamoDB' do
+  it 'supports querying documents by index in DynamoDB' do
 
-    items = [{k1: 'a1', k2: 12}, {k1: 'a1', k2: 24}]
+    items = [{k1: 'a1', k2: 12, k3: 'abc'}, {k1: 'a1', k2: 24, k3: 'def'}]
     Writer.new(connection_info).save_xyz(*items)
 
     client = Aws::DynamoDB::Client.new(connection_info)
@@ -100,4 +100,53 @@ RSpec.describe Writer do
 
     expect(response.count).to eql(2)
   end
+
+  it 'supports querying using key condition expressions' do
+    item = {
+        Id: 206,
+        Title: "20-Bicycle 206",
+        Description: "206 description",
+        BicycleType: "Hybrid",
+        Brand: "Brand-Company C",
+        Price: 500,
+        Color: ["Red", "Black"],
+        ProductCategory: "Bike",
+        InStock: true,
+        QuantityOnHand: nil,
+        RelatedItems: [
+            341,
+            472,
+            649
+        ],
+        Pictures: {
+            FrontView: "http://example.com/products/206_front.jpg",
+            RearView: "http://example.com/products/206_rear.jpg",
+            SideView: "http://example.com/products/206_left_side.jpg"
+        },
+        ProductReviews: {
+            FiveStar: [
+                "Excellent! Can't recommend it highly enough!  Buy it!",
+                "Do yourself a favor and buy this."
+            ],
+            OneStar: [
+                "Terrible product!  Do not buy this."
+            ]
+        }
+    }
+    Writer.new(connection_info).save_product(item)
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    response = client.query({
+                                table_name: 'products',
+                                key_condition_expression: 'Id = :v_id',
+                                expression_attribute_values: {
+                                    ':v_id': 206
+                                }
+                            })
+
+    expect(response.items[0]).not_to be_nil
+    found_item = response.items[0]
+    expect(found_item['Title']).to eql("20-Bicycle 206")
+  end
+
 end
