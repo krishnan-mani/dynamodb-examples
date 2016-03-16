@@ -34,6 +34,16 @@ class Writer
     end
   end
 
+  def save_kar(*items)
+    ensure_kar_table
+    items.each do |item|
+      @client.put_item({
+                           table_name: 'kar',
+                           item: item
+                       })
+    end
+  end
+
   def save_bar(*items)
     ensure_bar_table
     items.each do |item|
@@ -162,6 +172,30 @@ class Writer
                                key_schema: [
                                    {
                                        attribute_name: 'k1',
+                                       key_type: 'HASH'
+                                   }
+                               ],
+                               provisioned_throughput: {
+                                   read_capacity_units: 1,
+                                   write_capacity_units: 1
+                               }
+                           })
+    end
+  end
+
+  def ensure_kar_table
+    unless table_exists?('kar')
+      @client.create_table({
+                               table_name: 'kar',
+                               attribute_definitions: [
+                                   {
+                                       attribute_name: 'k2',
+                                       attribute_type: 'S'
+                                   }
+                               ],
+                               key_schema: [
+                                   {
+                                       attribute_name: 'k2',
                                        key_type: 'HASH'
                                    }
                                ],
