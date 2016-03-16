@@ -4,7 +4,6 @@ require 'aws-sdk'
 
 RSpec.describe Writer do
   connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
-  # connection_info = {:region => 'us-east-1'}
 
   before(:each) do
     client = Aws::DynamoDB::Client.new(connection_info)
@@ -16,7 +15,7 @@ RSpec.describe Writer do
     end
   end
 
-  it 'saves a rich document by hash key to DynamoDB' do
+  it 'saves a rich item by hash key to DynamoDB' do
     item = {
         k1: 'v1',
         k2: 23,
@@ -42,7 +41,7 @@ RSpec.describe Writer do
     expect(response.item[:k2]).to eql(item['k2'])
   end
 
-  it 'saves disparate documents by hash key to DynamoDB' do
+  it 'saves disparate items by hash key to DynamoDB' do
     items = [{k1: 'x1', k2: [1, 2, 3]}, {k1: 'x2', k2: true}]
     Writer.new(connection_info).save_foo(*items)
 
@@ -66,23 +65,7 @@ RSpec.describe Writer do
     expect(response.item['k2'].length).to eql(3)
   end
 
-  it 'saves multiple documents by hash and range keys to DynamoDB' do
-    items = [{k1: 'a1', k2: 'a2'}, {k1: 'a1', k2: 'y'}]
-    Writer.new(connection_info).save_bar(*items)
-
-    client = Aws::DynamoDB::Client.new(connection_info)
-    response = client.query({
-                                table_name: 'bar',
-                                select: 'COUNT',
-                                key_condition_expression: 'k1 = :v_k1',
-                                expression_attribute_values: {
-                                    ':v_k1': 'a1'
-                                }
-                            })
-    expect(response.count).to eql(2)
-  end
-
-  it 'supports querying documents by index in DynamoDB' do
+  it 'supports querying items in DynamoDB to obtain a count' do
     items = [{k1: 'a1', k2: 12, k3: 'abc'}, {k1: 'a1', k2: 24, k3: 'def'}]
     Writer.new(connection_info).save_xyz(*items)
 
@@ -99,39 +82,7 @@ RSpec.describe Writer do
     expect(response.count).to eql(2)
   end
 
-  it 'supports querying using hash key and comparison on range key using begins_with' do
-    items = [
-        {
-            Id: 206,
-            Brand: 'Reebok',
-            Size: 8
-        },
-        {
-            Id: 206,
-            Brand: 'Nike'
-        },
-        {
-            Id: 206,
-            Brand: 'Ni Hao'
-        }
-    ]
-    Writer.new(connection_info).save_shoes(*items)
-
-    client = Aws::DynamoDB::Client.new(connection_info)
-    response = client.query({
-                                table_name: 'shoes',
-                                key_condition_expression: 'Id = :v_id AND begins_with(Brand, :v_brand)',
-                                expression_attribute_values: {
-                                    ':v_id': 206,
-                                    ':v_brand': 'Ni'
-                                }
-                            })
-
-    expect(response.items).not_to be_nil
-    expect(response.count).to eql(2)
-  end
-
-  it 'supports querying using key condition expressions' do
+  it 'supports querying using key condition expression' do
     item = {
         'a866': 206,
         Title: "20-Bicycle 206",
