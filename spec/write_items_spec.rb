@@ -2,10 +2,9 @@ require_relative '../lib/writer'
 
 require 'aws-sdk'
 
-require 'byebug'
-
 RSpec.describe Writer do
   connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
+  # connection_info = {:region => 'us-east-1'}
 
   before(:each) do
     client = Aws::DynamoDB::Client.new(connection_info)
@@ -84,7 +83,6 @@ RSpec.describe Writer do
   end
 
   it 'supports querying documents by index in DynamoDB' do
-
     items = [{k1: 'a1', k2: 12, k3: 'abc'}, {k1: 'a1', k2: 24, k3: 'def'}]
     Writer.new(connection_info).save_xyz(*items)
 
@@ -111,6 +109,10 @@ RSpec.describe Writer do
         {
             Id: 206,
             Brand: 'Nike'
+        },
+        {
+            Id: 206,
+            Brand: 'Ni Hao'
         }
     ]
     Writer.new(connection_info).save_shoes(*items)
@@ -126,13 +128,12 @@ RSpec.describe Writer do
                             })
 
     expect(response.items).not_to be_nil
-    expect(response.count).to eql(1)
-    expect(response.items[0]['Brand']).to eql('Nike')
+    expect(response.count).to eql(2)
   end
 
   it 'supports querying using key condition expressions' do
     item = {
-        Id: 206,
+        'a866': 206,
         Title: "20-Bicycle 206",
         Description: "206 description",
         BicycleType: "Hybrid",
@@ -167,7 +168,7 @@ RSpec.describe Writer do
     client = Aws::DynamoDB::Client.new(connection_info)
     response = client.query({
                                 table_name: 'products',
-                                key_condition_expression: 'Id = :v_id',
+                                key_condition_expression: "a866 = :v_id",
                                 expression_attribute_values: {
                                     ':v_id': 206
                                 }

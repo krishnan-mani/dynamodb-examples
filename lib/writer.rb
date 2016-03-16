@@ -98,13 +98,13 @@ class Writer
                                table_name: 'products',
                                attribute_definitions: [
                                    {
-                                       attribute_name: 'Id',
+                                       attribute_name: 'a866',
                                        attribute_type: 'N'
                                    }
                                ],
                                key_schema: [
                                    {
-                                       attribute_name: 'Id',
+                                       attribute_name: 'a866',
                                        key_type: 'HASH'
                                    }
                                ],
