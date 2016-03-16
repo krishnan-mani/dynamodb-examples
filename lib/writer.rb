@@ -191,12 +191,20 @@ class Writer
                                    {
                                        attribute_name: 'k2',
                                        attribute_type: 'S'
+                                   },
+                                   {
+                                       attribute_name: 'x1',
+                                       attribute_type: 'S'
                                    }
                                ],
                                key_schema: [
                                    {
                                        attribute_name: 'k2',
                                        key_type: 'HASH'
+                                   },
+                                   {
+                                       attribute_name: 'x1',
+                                       key_type: 'RANGE'
                                    }
                                ],
                                provisioned_throughput: {

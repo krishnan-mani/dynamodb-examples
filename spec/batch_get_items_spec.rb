@@ -17,7 +17,7 @@ RSpec.describe Writer do
     writer.save_foo(*foo_items)
 
     kar_items = [{
-                     'k2': 'jim', 't3': 'bonbon'
+                     'k2': 'jim', 'x1': 'bonbon'
                  },
                  {
                      'k2': 'beam', 'x1': 'martin'
@@ -40,7 +40,8 @@ RSpec.describe Writer do
                                              'kar': {
                                                  keys: [
                                                      {
-                                                         'k2': 'beam'
+                                                         'k2': 'beam',
+                                                         'x1': 'martin'
                                                      }
                                                  ]
 
