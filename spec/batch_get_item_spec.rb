@@ -66,8 +66,27 @@ RSpec.describe 'batch_get_item operation' do
     expect(martin_items.first['x1']).to eql('martin')
   end
 
-  it 'raises a ValidationException if returning more than 100 items' do
-    :pending
+  it "If you request more than 100 items BatchGetItem will return a ValidationException with the message 'Too many items requested for the BatchGetItem call'" do
+    one_hundred_and_one_items = (1..101).collect do |idx|
+      {'k1': "X#{idx}", 'idx': idx}
+    end
+
+    key_expression_list = (1..101).collect do |idx|
+      {'k1': "X#{idx}"}
+    end
+
+    Writer.new(connection_info).save_foo(*one_hundred_and_one_items)
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    expect {
+      client.batch_get_item({
+                                request_items: {
+                                    'foo': {
+                                        keys: key_expression_list
+                                    }
+                                }
+                            })
+    }.to raise_error(Aws::DynamoDB::Errors::ValidationException, 'Too many items requested for the BatchGetItem call')
   end
 
 end
