@@ -50,6 +50,7 @@ RSpec.describe Writer do
                                      })
 
     expect(response.responses['foo']).not_to be_nil
+    expect(response.responses['foo'].length).to eql(2)
     jam_items = response.responses['foo'].select { |x|
       x['k1'] == 'x1'
     }
@@ -57,6 +58,7 @@ RSpec.describe Writer do
     expect(jam_items.first['j1']).to eql('jam')
 
     expect(response.responses['kar']).not_to be_nil
+    expect(response.responses['kar'].length).to eql(1)
     martin_items = response.responses['kar'].select { |y|
       y['k2'] == 'beam'
     }
