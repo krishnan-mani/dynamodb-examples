@@ -99,6 +99,9 @@ class Writer
                                    write_capacity_units: 1
                                }
                            })
+
+      shoes_table = (Aws::DynamoDB::Resource.new(client: @client)).table('shoes')
+      shoes_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
     end
   end
 
@@ -123,6 +126,9 @@ class Writer
                                    write_capacity_units: 1
                                }
                            })
+
+      products_table = (Aws::DynamoDB::Resource.new(client: @client)).table('products')
+      products_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
     end
   end
 
@@ -156,6 +162,8 @@ class Writer
                                }
                            })
 
+      xyz_table = (Aws::DynamoDB::Resource.new(client: @client)).table('xyz')
+      xyz_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
     end
   end
 
@@ -180,6 +188,9 @@ class Writer
                                    write_capacity_units: 1
                                }
                            })
+
+      foo_table = (Aws::DynamoDB::Resource.new(client: @client)).table('foo')
+      foo_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
     end
   end
 
@@ -213,6 +224,9 @@ class Writer
                                }
                            })
     end
+
+    kar_table = (Aws::DynamoDB::Resource.new(client: @client)).table('kar')
+    kar_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
   end
 
   def ensure_bar_table
@@ -244,6 +258,9 @@ class Writer
                                    write_capacity_units: 1
                                }
                            })
+
+      bar_table = (Aws::DynamoDB::Resource.new(client: @client)).table('bar')
+      bar_table.wait_until(max_attempts: 5, delay: 2) { |table| table.table_status == 'ACTIVE' }
     end
   end
 

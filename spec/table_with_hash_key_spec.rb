@@ -7,11 +7,14 @@ RSpec.describe 'table with hash key only' do
 
   before(:each) do
     client = Aws::DynamoDB::Client.new(connection_info)
-    tables = client.list_tables.table_names
+    existing_tables = client.list_tables.table_names
+    tables = ['foo', 'xyz', 'products']
     tables.each do |table|
-      client.delete_table({
-                              table_name: table
-                          })
+      if existing_tables.include?(table)
+        client.delete_table({
+                                table_name: table
+                            })
+      end
     end
   end
 
