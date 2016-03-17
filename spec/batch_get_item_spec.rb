@@ -2,7 +2,7 @@ require_relative '../lib/writer'
 
 require 'aws-sdk'
 
-RSpec.describe Writer do
+RSpec.describe 'batch_get_item operation' do
 
   connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
 
@@ -64,6 +64,10 @@ RSpec.describe Writer do
     }
     expect(martin_items.length).to eql(1)
     expect(martin_items.first['x1']).to eql('martin')
+  end
+
+  it 'raises a ValidationException if returning more than 100 items' do
+    :pending
   end
 
 end

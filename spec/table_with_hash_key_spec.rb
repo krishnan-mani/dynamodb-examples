@@ -2,7 +2,7 @@ require_relative '../lib/writer'
 
 require 'aws-sdk'
 
-RSpec.describe Writer do
+RSpec.describe 'table with hash key only' do
   connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
 
   before(:each) do
