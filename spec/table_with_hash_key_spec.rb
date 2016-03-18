@@ -1,12 +1,6 @@
-require_relative '../lib/writer'
-
 require 'aws-sdk'
 
 RSpec.describe 'table with hash key only' do
-
-  before(:each) do
-    delete_table('foo', 'xyz', 'products')
-  end
 
   it 'saves a rich item by hash key to DynamoDB' do
     item = {
@@ -19,9 +13,13 @@ RSpec.describe 'table with hash key only' do
             'k52': 'def'
         }
     }
-    Writer.new(connection_info).save_foo(item)
-
+    recreate_table('foo', 'k1', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    client.put_item({
+                        table_name: 'foo',
+                        item: item
+                    })
+
     response = client.get_item({
                                    table_name: 'foo',
                                    key: {
@@ -36,9 +34,16 @@ RSpec.describe 'table with hash key only' do
 
   it 'saves disparate items by hash key to DynamoDB' do
     items = [{k1: 'x1', k2: [1, 2, 3]}, {k1: 'x2', k2: true}]
-    Writer.new(connection_info).save_foo(*items)
 
+    recreate_table('foo', 'k1', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    items.each do |item|
+      client.put_item({
+                          table_name: 'foo',
+                          item: item
+                      })
+    end
+
     response = client.get_item({
                                    table_name: 'foo',
                                    key: {
@@ -60,15 +65,21 @@ RSpec.describe 'table with hash key only' do
 
   it 'supports querying items in DynamoDB to obtain a count' do
     items = [{k1: 'a1', k2: 12, k3: 'abc'}, {k1: 'a1', k2: 24, k3: 'def'}]
-    Writer.new(connection_info).save_xyz(*items)
-
+    recreate_table('xyz', 'k1', 'S', 'k2', 'N')
     client = Aws::DynamoDB::Client.new(connection_info)
+    items.each do |item|
+      client.put_item({
+                          table_name: 'xyz',
+                          item: item
+                      })
+    end
+
     response = client.query({
                                 table_name: 'xyz',
                                 select: 'COUNT',
                                 key_condition_expression: 'k1 = :v_k1',
                                 expression_attribute_values: {
-                                    ':v_k1': 'a1'
+                                    ':v_k1': 'a1',
                                 }
                             })
 
@@ -107,9 +118,14 @@ RSpec.describe 'table with hash key only' do
             ]
         }
     }
-    Writer.new(connection_info).save_product(item)
 
+    recreate_table('products', 'a866', 'N')
     client = Aws::DynamoDB::Client.new(connection_info)
+    client.put_item({
+                        table_name: 'products',
+                        item: item
+                    })
+
     response = client.query({
                                 table_name: 'products',
                                 key_condition_expression: "a866 = :v_id",

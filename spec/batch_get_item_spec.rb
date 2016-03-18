@@ -1,5 +1,3 @@
-require_relative '../lib/writer'
-
 require 'aws-sdk'
 
 RSpec.describe 'batch_get_item operation' do

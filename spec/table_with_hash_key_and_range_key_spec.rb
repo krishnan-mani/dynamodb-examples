@@ -1,5 +1,3 @@
-require_relative '../lib/writer'
-
 require 'aws-sdk'
 
 RSpec.describe 'table with partition (hash) key and sort (range) key' do
