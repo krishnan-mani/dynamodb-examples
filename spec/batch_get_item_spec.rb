@@ -4,19 +4,8 @@ require 'aws-sdk'
 
 RSpec.describe 'batch_get_item operation' do
 
-  connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
-
   before(:each) do
-    client = Aws::DynamoDB::Client.new(connection_info)
-    existing_tables = client.list_tables.table_names
-    tables = ['foo']
-    tables.each do |table|
-      if existing_tables.include?(table)
-        client.delete_table({
-                                table_name: table
-                            })
-      end
-    end
+    delete_table('foo')
   end
 
 
