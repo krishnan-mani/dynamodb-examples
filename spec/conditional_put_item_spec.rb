@@ -4,20 +4,8 @@ require_relative '../lib/writer'
 
 RSpec.describe 'conditional put_item operations' do
 
-  connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
-
   before(:each) do
-    client = Aws::DynamoDB::Client.new(connection_info)
-    existing_tables = client.list_tables.table_names
-
-    tables = ['foo']
-    tables.each do |table|
-      if existing_tables.include?(table)
-        client.delete_table({
-                                table_name: table
-                            })
-      end
-    end
+    delete_table('foo')
   end
 
   it "add a new item if one with the specified primary key doesn't exist" do
