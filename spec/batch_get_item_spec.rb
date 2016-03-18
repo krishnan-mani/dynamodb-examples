@@ -4,20 +4,22 @@ require 'aws-sdk'
 
 RSpec.describe 'batch_get_item operation' do
 
-  before(:each) do
-    delete_table('foo')
-  end
-
-
   it 'fetches items from multiple tables using batch_get_item' do
-    writer = Writer.new(connection_info)
     foo_items = [{
                      'k1': 'x1', 'j1': 'jam'
                  },
                  {
                      'k1': 'x2', 'x2': 'marmalade'
                  }]
-    writer.save_foo(*foo_items)
+
+    recreate_table('foo', 'k1', 'S')
+    client = Aws::DynamoDB::Client.new(connection_info)
+    foo_items.each do |item|
+      client.put_item({
+                          table_name: 'foo',
+                          item: item
+                      })
+    end
 
     kar_items = [{
                      'k2': 'jim', 'x1': 'bonbon'
@@ -25,9 +27,15 @@ RSpec.describe 'batch_get_item operation' do
                  {
                      'k2': 'beam', 'x1': 'martin'
                  }]
-    writer.save_kar(*kar_items)
 
-    client = Aws::DynamoDB::Client.new(connection_info)
+    recreate_table('kar', 'k2', 'S', 'x1', 'S')
+    kar_items.each do |item|
+      client.put_item({
+                          table_name: 'kar',
+                          item: item
+                      })
+    end
+
     response = client.batch_get_item({
                                          request_items: {
                                              'foo': {
@@ -78,9 +86,16 @@ RSpec.describe 'batch_get_item operation' do
       {'k1': "X#{idx}"}
     end
 
-    Writer.new(connection_info).save_foo(*one_hundred_and_one_items)
-
+    recreate_table('foo', 'k1', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    one_hundred_and_one_items.each do |item|
+      client.put_item({
+                     table_name: 'foo',
+                     item: item
+                 })
+    end
+
+
     expect {
       client.batch_get_item({
                                 request_items: {
