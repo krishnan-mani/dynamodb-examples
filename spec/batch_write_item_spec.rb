@@ -118,7 +118,59 @@ RSpec.describe 'batch_write_item' do
   end
 
   it 'deletes multiple items in one table' do
-    :pending
+    topalov = {
+        'k1': 'Veselin',
+        'k2': 'Topalov'
+    }
+    giri = {
+        'k1': 'Anish',
+        'k2': 'Giri'
+    }
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    client.create_table(get_table_definition('chess_players', 'k1'))
+    client.put_item({
+                        table_name: 'chess_players',
+                        item: topalov
+                    })
+    client.put_item({
+                        table_name: 'chess_players',
+                        item: giri
+                    })
+
+    get_item_response = client.get_item({
+                                            table_name: 'chess_players',
+                                            key: {
+                                                'k1': 'Veselin'
+                                            }
+                                        })
+    expect(get_item_response.item).not_to be_nil
+    expect(get_item_response.item['k1']).to eql('Veselin')
+
+    client.batch_write_item({
+                                request_items: {
+                                    'chess_players': [
+                                        {
+                                            delete_request: {
+                                                key: {'k1': 'Veselin'}
+                                            }
+                                        },
+                                        {
+                                            delete_request: {
+                                                key: {'k1': 'Anish'}
+                                            }
+                                        }
+                                    ]
+                                }
+                            })
+
+    get_item_response = client.get_item({
+                                            table_name: 'chess_players',
+                                            key: {
+                                                'k1': 'Anish'
+                                            }
+                                        })
+    expect(get_item_response.item).to be_nil
   end
 
   it 'deletes multiple items in more than one table' do
