@@ -3,19 +3,9 @@ require_relative '../lib/writer'
 require 'aws-sdk'
 
 RSpec.describe 'table with partition (hash) key and sort (range) key' do
-  connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
 
   before(:each) do
-    client = Aws::DynamoDB::Client.new(connection_info)
-    existing_tables = client.list_tables.table_names
-    tables = ['bar', 'shoes']
-    tables.each do |table|
-      if existing_tables.include?(table)
-        client.delete_table({
-                                table_name: table
-                            })
-      end
-    end
+    delete_table('bar', 'shoes')
   end
 
   it 'saves multiple items by hash and range keys to DynamoDB' do
