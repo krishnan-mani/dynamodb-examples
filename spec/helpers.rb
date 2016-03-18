@@ -2,12 +2,19 @@ def connection_info
   {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
 end
 
-def delete_table(table_name)
+def table_exists?(table_name)
   client = Aws::DynamoDB::Client.new(connection_info)
-  if client.list_tables.table_names.include?(table_name)
-    client.delete_table({
-                            table_name: table_name
-                        })
+  client.list_tables.table_names.include?(table_name)
+end
+
+def delete_table(*table_names)
+  client = Aws::DynamoDB::Client.new(connection_info)
+  table_names.each do |table_name|
+    if table_exists?(table_name)
+      client.delete_table({
+                              table_name: table_name
+                          })
+    end
   end
 end
 

@@ -4,19 +4,8 @@ require_relative '../lib/writer'
 
 RSpec.describe 'batch_write_item' do
 
-  connection_info = {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
-
   before(:each) do
-    client = Aws::DynamoDB::Client.new(connection_info)
-    existing_tables = client.list_tables.table_names
-    tables = ['foo', 'chess_players', 'cricketers']
-    tables.each do |table|
-      if existing_tables.include?(table)
-        client.delete_table({
-                                table_name: table
-                            })
-      end
-    end
+    delete_table('foo', 'chess_players', 'cricketers')
   end
 
   it 'puts multiple items in one table' do
