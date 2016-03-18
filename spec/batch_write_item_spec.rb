@@ -20,9 +20,13 @@ RSpec.describe 'batch_write_item' do
         'k2': 'Svidler'
     }
 
-    Writer.new(connection_info).save_foo(magnus)
-
+    recreate_table('foo', 'k1', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    client.put_item({
+                        table_name: 'foo',
+                        item: magnus
+                    })
+
     response = client.batch_write_item({
                                            request_items: {
                                                'foo': [
