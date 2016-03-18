@@ -70,8 +70,8 @@ RSpec.describe 'batch_write_item' do
     }
 
     client = Aws::DynamoDB::Client.new(connection_info)
-    client.create_table(get_table_definition('chess_players', 'k1'))
-    client.create_table(get_table_definition('cricketers', 'fn'))
+    client.create_table(get_table_definition('chess_players', 'k1', 'S'))
+    client.create_table(get_table_definition('cricketers', 'fn', 'S'))
 
     response = client.batch_write_item({
                                            request_items: {
@@ -117,7 +117,7 @@ RSpec.describe 'batch_write_item' do
     }
 
     client = Aws::DynamoDB::Client.new(connection_info)
-    client.create_table(get_table_definition('chess_players', 'k1'))
+    client.create_table(get_table_definition('chess_players', 'k1', 'S'))
     client.put_item({
                         table_name: 'chess_players',
                         item: topalov
@@ -174,8 +174,8 @@ RSpec.describe 'batch_write_item' do
     }
 
     client = Aws::DynamoDB::Client.new(connection_info)
-    client.create_table(get_table_definition('chess_players', 'k1'))
-    client.create_table(get_table_definition('cricketers', 'fn'))
+    client.create_table(get_table_definition('chess_players', 'k1', 'S'))
+    client.create_table(get_table_definition('cricketers', 'fn', 'S'))
 
     client.put_item({
                         table_name: 'chess_players',

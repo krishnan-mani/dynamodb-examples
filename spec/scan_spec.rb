@@ -20,7 +20,7 @@ RSpec.describe 'scan' do
         'k2': 'Anbazhagan'
     }
 
-    recreate_table('chess_players', 'k1', 'k2')
+    recreate_table('chess_players', 'k1', 'S', 'k2', 'S')
 
     client = Aws::DynamoDB::Client.new(connection_info)
     client.put_item({

@@ -18,20 +18,24 @@ def delete_table(*table_names)
   end
 end
 
-def recreate_table(table_name, hash_key, sort_key = nil)
+def recreate_table(table_name, hash_key, hash_key_type, sort_key = nil, sort_key_type = nil)
   client = Aws::DynamoDB::Client.new(connection_info)
   delete_table(table_name)
-  client.create_table(get_table_definition(table_name, hash_key, sort_key))
+  client.create_table(get_table_definition(table_name, hash_key, hash_key_type, sort_key, sort_key_type))
 end
 
-def get_table_definition(table_name, hash_key, sort_key = nil)
+def get_table_definition(table_name, hash_key, hash_key_type, sort_key = nil, sort_key_type = nil)
+  if sort_key
+    raise InvalidArgumentError, 'Specify a type for sort key' unless sort_key_type
+  end
+
   table_definition = {
       table_name: table_name
   }
 
   attribute_definitions = [{
                                attribute_name: hash_key,
-                               attribute_type: 'S'
+                               attribute_type: hash_key_type
                            }]
 
   key_schema = [
@@ -44,7 +48,7 @@ def get_table_definition(table_name, hash_key, sort_key = nil)
   if sort_key
     attribute_definitions << {
         attribute_name: sort_key,
-        attribute_type: 'S'
+        attribute_type: sort_key_type
     }
 
     key_schema << {

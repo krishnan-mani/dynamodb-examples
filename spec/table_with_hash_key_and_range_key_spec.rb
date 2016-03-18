@@ -4,15 +4,18 @@ require 'aws-sdk'
 
 RSpec.describe 'table with partition (hash) key and sort (range) key' do
 
-  before(:each) do
-    delete_table('bar', 'shoes')
-  end
-
   it 'saves multiple items by hash and range keys to DynamoDB' do
     items = [{k1: 'a1', k2: 'a2'}, {k1: 'a1', k2: 'y'}]
-    Writer.new(connection_info).save_bar(*items)
 
+    recreate_table('bar', 'k1', 'S', 'k2', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    items.each do |item|
+      client.put_item({
+                          table_name: 'bar',
+                          item: item
+                      })
+    end
+
     response = client.query({
                                 table_name: 'bar',
                                 select: 'COUNT',
@@ -40,9 +43,16 @@ RSpec.describe 'table with partition (hash) key and sort (range) key' do
             Brand: 'Ni Hao'
         }
     ]
-    Writer.new(connection_info).save_shoes(*items)
 
+    recreate_table('shoes', 'Id', 'N', 'Brand', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    items.each do |item|
+      client.put_item({
+                          table_name: 'shoes',
+                          item: item
+                      })
+    end
+
     response = client.query({
                                 table_name: 'shoes',
                                 key_condition_expression: 'Id = :v_id AND begins_with(Brand, :v_brand)',
