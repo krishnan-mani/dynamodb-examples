@@ -9,7 +9,7 @@ RSpec.describe 'batch_write_item' do
   before(:each) do
     client = Aws::DynamoDB::Client.new(connection_info)
     existing_tables = client.list_tables.table_names
-    tables = ['foo']
+    tables = ['foo', 'chess_players', 'cricketers']
     tables.each do |table|
       if existing_tables.include?(table)
         client.delete_table({
@@ -66,7 +66,55 @@ RSpec.describe 'batch_write_item' do
   end
 
   it 'puts multiple items in more than one table' do
-    :pending
+    karjakin = {
+        'k1': 'Sergey',
+        'k2': 'Karjakin'
+    }
+    caruana = {
+        'k1': 'Fabiano',
+        'k2': 'Caruana'
+    }
+
+    rohit = {
+        'fn': 'Rohit',
+        'ln': 'Sharma'
+    }
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    client.create_table(get_table_definition('chess_players', 'k1'))
+    client.create_table(get_table_definition('cricketers', 'fn'))
+
+    response = client.batch_write_item({
+                                           request_items: {
+                                               'chess_players': [
+                                                   {put_request: {item: karjakin}},
+                                                   {put_request: {item: caruana}}
+                                               ],
+                                               'cricketers': [
+                                                   {put_request: {item: rohit}}
+                                               ]
+                                           }
+                                       })
+
+    expect(response.unprocessed_items).to be_empty
+
+    get_chess_players_response = client.get_item({
+                                                     table_name: 'chess_players',
+                                                     key: {
+                                                         'k1': 'Sergey'
+                                                     }
+                                                 })
+    expect(get_chess_players_response.item).not_to be_nil
+    expect(get_chess_players_response.item['k2']).to eql('Karjakin')
+
+    get_cricketers_response = client.get_item({
+                                                  table_name: 'cricketers',
+                                                  key: {
+                                                      'fn': 'Rohit'
+                                                  }
+                                              })
+    expect(get_cricketers_response.item).not_to be_nil
+    expect(get_cricketers_response.item['ln']).to eql('Sharma')
   end
 
   it 'deletes multiple items in one table' do
@@ -75,6 +123,45 @@ RSpec.describe 'batch_write_item' do
 
   it 'deletes multiple items in more than one table' do
     :pending
+  end
+
+  def get_table_definition(table_name, hash_key, sort_key = nil)
+    table_definition = {
+        table_name: table_name
+    }
+
+    attribute_definitions = [{
+                                 attribute_name: hash_key,
+                                 attribute_type: 'S'
+                             }]
+
+    key_schema = [
+        {
+            attribute_name: hash_key,
+            key_type: 'HASH'
+        }
+    ]
+
+    if sort_key
+      attribute_definitions << {
+          attribute_name: sort_key,
+          attribute_type: 'S'
+      }
+
+      key_schema << {
+          attribute_name: sort_key,
+          key_type: 'RANGE'
+      }
+    end
+
+    table_definition[:attribute_definitions] = attribute_definitions
+    table_definition[:key_schema] = key_schema
+    table_definition[:provisioned_throughput] = {
+        read_capacity_units: 1,
+        write_capacity_units: 1
+    }
+
+    table_definition.dup
   end
 
 end
