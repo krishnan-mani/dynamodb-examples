@@ -174,7 +174,81 @@ RSpec.describe 'batch_write_item' do
   end
 
   it 'deletes multiple items in more than one table' do
-    :pending
+    nakamura = {
+        'k1': 'Hikaru',
+        'k2': 'Nakamura'
+    }
+
+    kohli = {
+        'fn': 'Virat',
+        'ln': 'Kohli'
+    }
+
+    client = Aws::DynamoDB::Client.new(connection_info)
+    client.create_table(get_table_definition('chess_players', 'k1'))
+    client.create_table(get_table_definition('cricketers', 'fn'))
+
+    client.put_item({
+                        table_name: 'chess_players',
+                        item: nakamura
+                    })
+    client.put_item({
+                        table_name: 'cricketers',
+                        item: kohli
+                    })
+
+    get_item_response = client.get_item({
+                                            table_name: 'chess_players',
+                                            key: {
+                                                'k1': 'Hikaru'
+                                            }
+                                        })
+    expect(get_item_response.item).not_to be_nil
+    expect(get_item_response.item['k1']).to eql('Hikaru')
+
+    get_item_response = client.get_item({
+                                            table_name: 'cricketers',
+                                            key: {
+                                                'fn': 'Virat'
+                                            }
+                                        })
+    expect(get_item_response.item).not_to be_nil
+    expect(get_item_response.item['fn']).to eql('Virat')
+
+    client.batch_write_item({
+                                request_items: {
+                                    'chess_players': [
+                                        {
+                                            delete_request: {
+                                                key: {'k1': 'Hikaru'}
+                                            }
+                                        }
+                                    ],
+                                    'cricketers': [
+                                        {
+                                            delete_request: {
+                                                key: {'fn': 'Virat'}
+                                            }
+                                        }
+                                    ]
+                                }
+                            })
+
+    get_item_response = client.get_item({
+                                            table_name: 'chess_players',
+                                            key: {
+                                                'k1': 'Hikaru'
+                                            }
+                                        })
+    expect(get_item_response.item).to be_nil
+
+    get_item_response = client.get_item({
+                                            table_name: 'cricketers',
+                                            key: {
+                                                'fn': 'Virat'
+                                            }
+                                        })
+    expect(get_item_response.item).to be_nil
   end
 
   def get_table_definition(table_name, hash_key, sort_key = nil)
