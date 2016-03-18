@@ -1,7 +1,5 @@
 require 'aws-sdk'
 
-require_relative '../lib/writer'
-
 RSpec.describe 'batch_write_item' do
 
   before(:each) do

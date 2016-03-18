@@ -1,19 +1,17 @@
 require 'aws-sdk'
 
-require_relative '../lib/writer'
-
 RSpec.describe 'conditional put_item operations' do
-
-  before(:each) do
-    delete_table('foo')
-  end
 
   it "add a new item if one with the specified primary key doesn't exist" do
     some_key = SecureRandom.uuid
     item = {'k1': some_key, 'k2': 'y'}
-    Writer.new(connection_info).save_foo(item)
 
+    recreate_table('foo', 'k1', 'S')
     client = Aws::DynamoDB::Client.new(connection_info)
+    client.put_item({
+                        table_name: 'foo',
+                        item: item
+                    })
     response = client.get_item({
                                    table_name: 'foo',
                                    key: {
