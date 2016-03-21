@@ -14,6 +14,7 @@ HOW-TO
 
 - Get client-side database and server imitating DynamoDB: [dynamodb-local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html)
 - Run dynamodb-local
+- Run spec tests
 
 ```
 # Run dynamodb-local
