@@ -55,7 +55,7 @@ RSpec.describe 'local secondary indexes' do
                                 write_capacity_units: 1
                             }
                         })
-    tournament_winners = {
+    tournament_wins = {
         reggio_emilia_93: {
             'tournament': 'Reggio Emilia 1993',
             'finish': 'first place',
@@ -89,7 +89,7 @@ RSpec.describe 'local secondary indexes' do
         }
     }
 
-    tournament_winners.each_value do |win|
+    tournament_wins.each_value do |win|
       client.put_item({
                           table_name: 'wins',
                           item: win

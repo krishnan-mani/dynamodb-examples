@@ -1,5 +1,9 @@
 def connection_info
-  {:region => 'us-east-1', :endpoint => 'http://localhost:8000'}
+  {
+      :access_key_id => 'some_aki', :secret_access_key => 'some_sak',
+      :region => 'us-east-1',
+      :endpoint => 'http://localhost:8000'
+  }
 end
 
 def table_exists?(table_name)
