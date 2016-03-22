@@ -9,7 +9,7 @@ Tests that illustrate use of the [aws-sdk API for DynamoDB](http://docs.aws.amaz
 - [table with hash key and range key](spec/table_with_hash_key_and_range_key_spec.rb)
 - [table with hash key](spec/table_with_hash_key_spec.rb)
 - [update_item](spec/update_item_spec.rb)
-- Operations including create_table, delete_table, get_item, and query are included in most spec tests
+- Operations including list_tables, create_table, delete_table, get_item, and query are included in most spec tests
 
 HOW-TO
 
