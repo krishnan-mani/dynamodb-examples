@@ -2,13 +2,14 @@ Tests that illustrate use of the [aws-sdk API for DynamoDB](http://docs.aws.amaz
 
 - [batch_get_item](spec/batch_get_item_spec.rb)
 - [batch_write_item](spec/batch_write_item_spec.rb)
-- [conditional_put_item](spec/conditional_put_item_spec.rb)
-- [global_secondary_index](spec/global_secondary_index_spec.rb)
-- [local_secondary_index](spec/local_secondary_index_spec.rb)
+- [conditional put_item](spec/conditional_put_item_spec.rb)
+- [global secondary indexes](spec/global_secondary_index_spec.rb)
+- [local secondary indexes](spec/local_secondary_index_spec.rb)
 - [scan](spec/scan_spec.rb)
-- [table_with_hash_key_and_range_key](spec/table_with_hash_key_and_range_key_spec.rb)
-- [table_with_hash_key](spec/table_with_hash_key_spec.rb)
+- [table with hash key and range key](spec/table_with_hash_key_and_range_key_spec.rb)
+- [table with hash key](spec/table_with_hash_key_spec.rb)
 - [update_item](spec/update_item_spec.rb)
+- Operations including create_table, delete_table, get_item, and query are included in most spec tests
 
 HOW-TO
 
