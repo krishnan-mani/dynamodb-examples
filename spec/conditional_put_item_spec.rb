@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'securerandom'
 
 RSpec.describe 'conditional put_item operations' do
 
