@@ -1,4 +1,4 @@
-require 'aws-sdk'
+require 'aws-sdk-dynamodb'
 
 RSpec.describe 'table with partition (hash) key and sort (range) key' do
 

@@ -1,4 +1,4 @@
-require 'aws-sdk'
+require 'aws-sdk-dynamodb'
 require 'securerandom'
 
 RSpec.describe 'conditional put_item operations' do

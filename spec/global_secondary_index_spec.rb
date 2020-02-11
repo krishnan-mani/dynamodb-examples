@@ -1,8 +1,8 @@
-require 'aws-sdk'
+require 'aws-sdk-dynamodb'
 
 RSpec.describe 'global secondary indexes' do
 
-  it 'use a global secondary index to locate items when the hash key values are not known', :focus => true do
+  it 'use a global secondary index to locate items when the hash key values are not known' do
 
     instance_states = [
         {

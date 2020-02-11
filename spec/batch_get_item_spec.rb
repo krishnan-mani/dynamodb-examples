@@ -1,4 +1,4 @@
-require 'aws-sdk'
+require 'aws-sdk-dynamodb'
 
 RSpec.describe 'batch_get_item operation' do
 

@@ -1,4 +1,4 @@
-require 'aws-sdk'
+require 'aws-sdk-dynamodb'
 
 RSpec.describe 'table with hash key only' do
 
